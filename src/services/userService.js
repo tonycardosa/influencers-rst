@@ -1,0 +1,61 @@
+const db = require('../config/database');
+
+async function findUserByEmail(email) {
+  const [rows] = await db.query('SELECT * FROM psrst_users WHERE email = ?', [email]);
+  return rows[0] || null;
+}
+
+async function findUserById(id) {
+  const [rows] = await db.query('SELECT * FROM psrst_users WHERE id = ?', [id]);
+  return rows[0] || null;
+}
+
+async function listInfluencers() {
+  const [rows] = await db.query(
+    'SELECT id, name, email, created_at FROM psrst_users WHERE role = ? ORDER BY created_at DESC',
+    ['influencer'],
+  );
+  return rows;
+}
+
+async function createInfluencer({ name, email }) {
+  await db.query(
+    'INSERT INTO psrst_users (name, email, role) VALUES (?, ?, "influencer")',
+    [name, email],
+  );
+}
+
+async function getUserWithDiscountCodes(id) {
+  const [users] = await db.query('SELECT * FROM psrst_users WHERE id = ?', [id]);
+  if (!users.length) {
+    return null;
+  }
+
+  const [codes] = await db.query(
+    `SELECT psrst_discount_codes.* FROM psrst_discount_codes WHERE user_id = ? ORDER BY prestashop_code`,
+    [id],
+  );
+
+  return { ...users[0], discountCodes: codes };
+}
+
+async function addDiscountCode(userId, code) {
+  await db.query(
+    'INSERT INTO psrst_discount_codes (user_id, prestashop_code) VALUES (?, ?)',
+    [userId, code],
+  );
+}
+
+async function removeDiscountCode(id) {
+  await db.query('DELETE FROM psrst_discount_codes WHERE id = ?', [id]);
+}
+
+module.exports = {
+  findUserByEmail,
+  findUserById,
+  listInfluencers,
+  createInfluencer,
+  getUserWithDiscountCodes,
+  addDiscountCode,
+  removeDiscountCode,
+};

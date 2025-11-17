@@ -1,0 +1,50 @@
+<section class="space-y-8">
+  <div class="rounded-lg bg-white p-6 shadow">
+    <h1 class="mb-6 text-2xl font-semibold text-rstgray">Influencers</h1>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead>
+          <tr class="text-xs uppercase text-gray-500">
+            <th class="px-4 py-2">Nome</th>
+            <th class="px-4 py-2">Email</th>
+            <th class="px-4 py-2">Criado</th>
+            <th class="px-4 py-2 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% influencers.forEach((inf) => { %>
+            <tr class="border-t">
+              <td class="px-4 py-2 font-medium text-rstgray"><%= inf.name %></td>
+              <td class="px-4 py-2"><%= inf.email %></td>
+              <td class="px-4 py-2 text-gray-500"><%= new Date(inf.created_at).toLocaleDateString() %></td>
+              <td class="px-4 py-2 text-right">
+                <a href="/admin/influencers/<%= inf.id %>" class="text-sm font-semibold text-rstred underline">Editar</a>
+              </td>
+            </tr>
+          <% }) %>
+          <% if (!influencers.length) { %>
+            <tr>
+              <td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">Sem registos</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="rounded-lg bg-white p-6 shadow">
+    <h2 class="mb-4 text-xl font-semibold text-rstgray">Adicionar influencer</h2>
+    <form method="POST" action="/admin/influencers" class="grid gap-6 md:grid-cols-2">
+      <div>
+        <label class="mb-2 block text-sm font-medium text-gray-700" for="name">Nome</label>
+        <input required type="text" id="name" name="name" class="w-full rounded border-gray-300 focus:border-rstred focus:ring-rstred" />
+      </div>
+      <div>
+        <label class="mb-2 block text-sm font-medium text-gray-700" for="email">Email</label>
+        <input required type="email" id="email" name="email" class="w-full rounded border-gray-300 focus:border-rstred focus:ring-rstred" />
+      </div>
+      <div class="md:col-span-2">
+        <button type="submit" class="rounded bg-rstred px-4 py-2 text-sm font-semibold uppercase text-white">Guardar</button>
+      </div>
+    </form>
+  </div>
+</section>

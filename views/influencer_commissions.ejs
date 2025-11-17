@@ -1,0 +1,39 @@
+<section class="space-y-8">
+  <div class="rounded-lg bg-white p-6 shadow">
+    <h1 class="text-2xl font-semibold text-rstgray">Comissões</h1>
+    <p class="text-sm text-gray-500">Histórico de encomendas atribuídas.</p>
+  </div>
+  <div class="rounded-lg bg-white p-6 shadow">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="text-xs uppercase text-gray-500">
+          <tr>
+            <th class="px-4 py-2">Encomenda</th>
+            <th class="px-4 py-2">Total</th>
+            <th class="px-4 py-2">Comissão</th>
+            <th class="px-4 py-2">Tipo</th>
+            <th class="px-4 py-2">Estado</th>
+            <th class="px-4 py-2">Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% commissions.forEach((commission) => { %>
+            <tr class="border-t">
+              <td class="px-4 py-2">#<%= commission.prestashop_order_id %></td>
+              <td class="px-4 py-2">€ <%= Number(commission.order_total_with_vat).toFixed(2) %></td>
+              <td class="px-4 py-2 font-semibold text-rstred">€ <%= Number(commission.commission_earned).toFixed(2) %></td>
+              <td class="px-4 py-2"><%= commission.is_first_purchase_commission ? 'Primeira compra' : 'Seguinte' %></td>
+              <td class="px-4 py-2 capitalize"><%= commission.status %></td>
+              <td class="px-4 py-2 text-gray-500"><%= new Date(commission.order_created_at).toLocaleDateString() %></td>
+            </tr>
+          <% }) %>
+          <% if (!commissions.length) { %>
+            <tr>
+              <td colspan="6" class="px-4 py-6 text-center text-sm text-gray-500">Sem comissões registadas.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

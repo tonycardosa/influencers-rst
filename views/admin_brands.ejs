@@ -1,0 +1,40 @@
+<section class="space-y-8">
+  <div class="flex flex-col justify-between gap-4 rounded-lg bg-white p-6 shadow md:flex-row md:items-center">
+    <div>
+      <h1 class="text-2xl font-semibold text-rstgray">Marcas</h1>
+      <p class="text-sm text-gray-500">Sincronize diretamente do Prestashop.</p>
+    </div>
+    <form method="POST" action="/admin/brands/sync">
+      <button
+        type="submit"
+        class="rounded bg-rstred px-4 py-2 text-sm font-semibold uppercase text-white">
+        Sincronizar
+      </button>
+    </form>
+  </div>
+  <div class="rounded-lg bg-white p-6 shadow">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="text-xs uppercase text-gray-500">
+          <tr>
+            <th class="px-4 py-2">Prestashop ID</th>
+            <th class="px-4 py-2">Nome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% brands.forEach((brand) => { %>
+            <tr class="border-t">
+              <td class="px-4 py-2 font-mono text-xs"><%= brand.prestashop_brand_id %></td>
+              <td class="px-4 py-2"><%= brand.name %></td>
+            </tr>
+          <% }) %>
+          <% if (!brands.length) { %>
+            <tr>
+              <td colspan="2" class="px-4 py-6 text-center text-sm text-gray-500">Sem marcas sincronizadas.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

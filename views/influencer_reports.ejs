@@ -1,0 +1,16 @@
+<section class="space-y-8">
+  <div class="rounded-lg bg-white p-6 shadow">
+    <h1 class="text-2xl font-semibold text-rstgray">Os meus ganhos</h1>
+    <p class="text-sm text-gray-500">Resumo rápido.</p>
+  </div>
+  <div class="grid gap-6 md:grid-cols-2">
+    <div class="rounded-lg bg-white p-6 shadow">
+      <p class="text-sm uppercase text-gray-500">Pendente</p>
+      <p class="mt-3 text-4xl font-semibold text-rstred">€ <%= (totals.totalPending || 0).toFixed(2) %></p>
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
+      <p class="text-sm uppercase text-gray-500">Pago</p>
+      <p class="mt-3 text-4xl font-semibold text-green-600">€ <%= (totals.totalPaid || 0).toFixed(2) %></p>
+    </div>
+  </div>
+</section>

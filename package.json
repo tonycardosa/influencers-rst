@@ -1,0 +1,37 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "RST Ferramentas affiliate management dashboard",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "lint": "echo \"No lint configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tonycardosa/dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tonycardosa/dashboard/issues"
+  },
+  "homepage": "https://github.com/tonycardosa/dashboard#readme",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "dayjs": "^1.11.19",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.2",
+    "mysql2": "^3.15.3",
+    "nodemailer": "^7.0.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

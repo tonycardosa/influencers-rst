@@ -1,0 +1,33 @@
+<section class="space-y-8">
+  <div class="rounded-lg bg-white p-6 shadow">
+    <h1 class="text-2xl font-semibold text-rstgray">As minhas regras</h1>
+    <p class="text-sm text-gray-500">Plano de comissões definido pelo admin da RST.</p>
+  </div>
+  <div class="rounded-lg bg-white p-6 shadow">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="text-xs uppercase text-gray-500">
+          <tr>
+            <th class="px-4 py-2">Marca</th>
+            <th class="px-4 py-2">% 1ª compra</th>
+            <th class="px-4 py-2">% seguintes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% rules.forEach((rule) => { %>
+            <tr class="border-t">
+              <td class="px-4 py-2"><%= rule.brand_name || 'Default' %></td>
+              <td class="px-4 py-2"><%= rule.commission_first %>%</td>
+              <td class="px-4 py-2"><%= rule.commission_subsequent %>%</td>
+            </tr>
+          <% }) %>
+          <% if (!rules.length) { %>
+            <tr>
+              <td colspan="3" class="px-4 py-6 text-center text-sm text-gray-500">Sem regras atribuídas.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

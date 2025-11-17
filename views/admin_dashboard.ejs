@@ -1,0 +1,25 @@
+<section class="space-y-8">
+  <div class="grid gap-6 md:grid-cols-2">
+    <div class="rounded-lg bg-white p-6 shadow">
+      <p class="text-sm uppercase text-gray-500">Total pendente</p>
+      <p class="mt-3 text-4xl font-semibold text-rstred">€ <%= (totals.totalPending || 0).toFixed(2) %></p>
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
+      <p class="text-sm uppercase text-gray-500">Total pago</p>
+      <p class="mt-3 text-4xl font-semibold text-green-600">€ <%= (totals.totalPaid || 0).toFixed(2) %></p>
+    </div>
+  </div>
+  <div class="rounded-lg bg-white p-6 shadow">
+    <h2 class="mb-4 text-lg font-semibold text-rstgray">Sincronização manual</h2>
+    <form method="POST" action="/admin/orders/sync" class="space-y-4">
+      <p class="text-sm text-gray-600">
+        Gera comissões para encomendas recentes do Prestashop nas situações em que exista um influencer associado.
+      </p>
+      <button
+        type="submit"
+        class="rounded bg-rstred px-4 py-2 text-sm font-semibold uppercase text-white">
+        Sincronizar encomendas
+      </button>
+    </form>
+  </div>
+</section>
