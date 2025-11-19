@@ -79,3 +79,13 @@ Certifique-se de definir `PRESTASHOP_API_URL` (ex.: `https://rstferramentas.com/
 - As views utilizam apenas utilitários Tailwind (CDN), sem build step adicional.
 - Ajuste/estenda os serviços dentro de `src/services` conforme novas integrações sejam necessárias.
 - Para acelerar testes em `localhost`, deixe `AUTO_LOGIN_LOCAL=true` no `.env` (não usar em produção) e a sessão é iniciada automaticamente com o admin definido em `LOCAL_AUTO_LOGIN_EMAIL`.
+
+## Deploy automatico via GitHub Actions
+
+Ao fazer push para a branch main, o workflow .github/workflows/deploy.yml envia os ficheiros do projeto para o cPanel via FTP/FTPS. Antes de ativar o workflow, crie estes *repository secrets* no GitHub:
+
+- CPANEL_HOST: hostname ou IP do servidor FTP/FTPS.
+- CPANEL_USERNAME: utilizador com acesso a pasta /home/redsuper/rstferramentas.com/_influencers/.
+- CPANEL_PASSWORD: password desse utilizador.
+
+Caso o diretorio ou protocolo mude, ajuste os campos server-dir ou protocol dentro do workflow.
