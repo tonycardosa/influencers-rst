@@ -27,6 +27,8 @@ jobs:
           exclude: |
             **/.git*
             **/.github/**
+            .git/**
+            .git/
             node_modules/**
             database/schema.sql
             README.md
