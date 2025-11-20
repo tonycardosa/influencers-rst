@@ -3,7 +3,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { isAuthenticated } = require('../middleware/auth');
 const {
   getTotalsForAdmin,
-  getTotalsForInfluencer,
+  getTotalsForAfiliado,
 } = require('../services/commissionService');
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.get(
       return res.render('admin_dashboard', { title: 'Dashboard', totals });
     }
 
-    const totals = await getTotalsForInfluencer(req.session.userId);
+    const totals = await getTotalsForAfiliado(req.session.userId);
     return res.render('influencer_dashboard', { title: 'Dashboard', totals });
   }),
 );

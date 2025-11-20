@@ -8,7 +8,7 @@
     <h2 class="mb-4 text-xl font-semibold text-rstgray">Nova / Atualizar regra</h2>
     <form method="POST" action="/admin/rules" class="grid gap-6 md:grid-cols-2">
       <div>
-        <label class="mb-2 block text-sm font-medium text-gray-700" for="user_id">Influencer</label>
+        <label class="mb-2 block text-sm font-medium text-gray-700" for="user_id">Afiliado</label>
         <select required id="user_id" name="user_id" class="w-full rounded border-gray-300 focus:border-rstred focus:ring-rstred">
           <option value="">Selecione</option>
           <% influencers.forEach((inf) => { %>
@@ -45,7 +45,7 @@
       <table class="min-w-full text-left text-sm">
         <thead class="text-xs uppercase text-gray-500">
           <tr>
-            <th class="px-4 py-2">Influencer</th>
+            <th class="px-4 py-2">Afiliado</th>
             <th class="px-4 py-2">Marca</th>
             <th class="px-4 py-2">% 1ª compra</th>
             <th class="px-4 py-2">% seguintes</th>

@@ -2,8 +2,8 @@ const express = require('express');
 const asyncHandler = require('../utils/asyncHandler');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
 const {
-  listInfluencers,
-  createInfluencer,
+  listAfiliados,
+  createAfiliado,
   getUserWithDiscountCodes,
   addDiscountCode,
   removeDiscountCode,
@@ -33,8 +33,8 @@ router.use(isAuthenticated, isAdmin);
 router.get(
   '/admin/influencers',
   asyncHandler(async (req, res) => {
-    const influencers = await listInfluencers();
-    res.render('admin_influencers', { title: 'Influencers', influencers });
+    const influencers = await listAfiliados();
+    res.render('admin_influencers', { title: 'Afiliados', influencers });
   }),
 );
 
@@ -46,8 +46,8 @@ router.post(
       setFlash(req, 'error', 'Nome e email são obrigatórios.');
       return res.redirect('/admin/influencers');
     }
-    await createInfluencer({ name, email });
-    setFlash(req, 'success', 'Influencer criado com sucesso.');
+    await createAfiliado({ name, email });
+    setFlash(req, 'success', 'Afiliado criado com sucesso.');
     res.redirect('/admin/influencers');
   }),
 );
@@ -59,7 +59,7 @@ router.get(
     if (!influencer) {
       return res.status(404).render('errors/404', { title: 'Não encontrado' });
     }
-    res.render('admin_influencer_edit', { title: 'Editar influencer', influencer });
+    res.render('admin_influencer_edit', { title: 'Editar afiliado', influencer });
   }),
 );
 
@@ -117,7 +117,7 @@ router.post(
 router.get(
   '/admin/rules',
   asyncHandler(async (req, res) => {
-    const influencers = await listInfluencers();
+    const influencers = await listAfiliados();
     const brands = await listBrands();
     const rules = await listRules();
     res.render('admin_rules', { title: 'Regras de comissão', influencers, brands, rules });

@@ -3,7 +3,7 @@ const db = require('../config/database');
 const { getSettings } = require('./settingsService');
 const prestashopService = require('./prestashopService');
 const { findBrandByPrestashopId } = require('./brandService');
-const { findRuleForInfluencerAndBrand } = require('./commissionRulesService');
+const { findRuleForAfiliadoAndBrand } = require('./commissionRulesService');
 
 async function getTotalsForAdmin() {
   const [[pending]] = await db.query(
@@ -18,14 +18,14 @@ async function getTotalsForAdmin() {
   };
 }
 
-async function getTotalsForInfluencer(influencerId) {
+async function getTotalsForAfiliado(afiliadoId) {
   const [[pending]] = await db.query(
-    'SELECT SUM(commission_earned) AS total FROM psrst_commissions WHERE status = "pending" AND influencer_id = ?',
-    [influencerId],
+    'SELECT SUM(commission_earned) AS total FROM psrst_commissions WHERE status = "pending" AND afiliado_id = ?',
+    [afiliadoId],
   );
   const [[paid]] = await db.query(
-    'SELECT SUM(commission_earned) AS total FROM psrst_commissions WHERE status = "paid" AND influencer_id = ?',
-    [influencerId],
+    'SELECT SUM(commission_earned) AS total FROM psrst_commissions WHERE status = "paid" AND afiliado_id = ?',
+    [afiliadoId],
   );
   return {
     totalPending: Number(pending.total || 0),
@@ -35,9 +35,9 @@ async function getTotalsForInfluencer(influencerId) {
 
 async function getPendingPayouts() {
   const [rows] = await db.query(
-    `SELECT c.*, u.name AS influencer_name
+    `SELECT c.*, u.name AS afiliado_name
      FROM psrst_commissions c
-     JOIN psrst_users u ON u.id = c.influencer_id
+     JOIN psrst_users u ON u.id = c.afiliado_id
      WHERE c.status = 'pending'
      ORDER BY u.name, c.order_created_at DESC`,
   );
@@ -65,22 +65,22 @@ async function findCustomerByPrestashopId(id) {
   return rows[0] || null;
 }
 
-async function createOrUpdateCustomer(prestashopCustomerId, email, influencerId) {
+async function createOrUpdateCustomer(prestashopCustomerId, email, afiliadoId) {
   const existing = await findCustomerByPrestashopId(prestashopCustomerId);
   if (!existing) {
     const [result] = await db.query(
-      'INSERT INTO psrst_customers (prestashop_customer_id, email, current_influencer_id) VALUES (?, ?, ?)',
-      [prestashopCustomerId, email, influencerId],
+      'INSERT INTO psrst_customers (prestashop_customer_id, email, current_afiliado_id) VALUES (?, ?, ?)',
+      [prestashopCustomerId, email, afiliadoId],
     );
     return { id: result.insertId, prestashop_customer_id: prestashopCustomerId };
   }
 
-  await db.query('UPDATE psrst_customers SET current_influencer_id = ?, email = ? WHERE id = ?', [
-    influencerId,
+  await db.query('UPDATE psrst_customers SET current_afiliado_id = ?, email = ? WHERE id = ?', [
+    afiliadoId,
     email,
     existing.id,
   ]);
-  return { ...existing, current_influencer_id: influencerId, email };
+  return { ...existing, current_afiliado_id: afiliadoId, email };
 }
 
 async function countCustomerCommissions(customerId) {
@@ -94,7 +94,7 @@ async function countCustomerCommissions(customerId) {
 async function insertCommission({
   prestashopOrderId,
   customerId,
-  influencerId,
+  afiliadoId,
   orderTotalWithVat,
   commissionEarned,
   isFirstPurchase,
@@ -102,13 +102,13 @@ async function insertCommission({
 }) {
   await db.query(
     `INSERT INTO psrst_commissions 
-      (prestashop_order_id, customer_id, influencer_id, order_total_with_vat, commission_earned, is_first_purchase_commission, status, order_created_at)
+      (prestashop_order_id, customer_id, afiliado_id, order_total_with_vat, commission_earned, is_first_purchase_commission, status, order_created_at)
      VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
     `,
     [
       prestashopOrderId,
       customerId,
-      influencerId,
+      afiliadoId,
       orderTotalWithVat,
       commissionEarned,
       isFirstPurchase ? 1 : 0,
@@ -117,16 +117,12 @@ async function insertCommission({
   );
 }
 
-async function determineInfluencerFromOrder(order) {
-  const cartRules = Array.isArray(order.associations?.cart_rules)
-    ? order.associations.cart_rules
-    : Array.isArray(order.associations?.cart_rows)
-      ? order.associations.cart_rows
-      : [];
-
+async function determineAfiliadoFromOrder(order, cartRules, settings) {
   if (cartRules.length) {
     for (const rule of cartRules) {
-      const code = rule?.code || rule?.cart_rule_name || rule?.name;
+      // The rule from order associations only has the ID. We need to fetch the full rule.
+      const ruleDetails = await prestashopService.fetchCartRuleDetails(settings, rule.id_cart_rule);
+      const code = ruleDetails?.code;
       if (!code) continue;
       const [rows] = await db.query('SELECT * FROM psrst_discount_codes WHERE prestashop_code = ?', [
         code,
@@ -143,12 +139,12 @@ async function determineInfluencerFromOrder(order) {
     [order.id_customer],
   );
   if (customers.length) {
-    return customers[0].current_influencer_id;
+    return customers[0].current_afiliado_id;
   }
   return null;
 }
 
-async function calculateCommissionForOrder({ order, orderDetails, influencerId, isFirst }) {
+async function calculateCommissionForOrder({ order, orderDetails, afiliadoId, isFirst }) {
   let commissionTotal = 0;
   let orderTotalWithVat = 0;
 
@@ -165,10 +161,10 @@ async function calculateCommissionForOrder({ order, orderDetails, influencerId, 
     const brand = await findBrandByPrestashopId(detail.id_manufacturer);
     let rule = null;
     if (brand) {
-      rule = await findRuleForInfluencerAndBrand(influencerId, brand.id);
+      rule = await findRuleForAfiliadoAndBrand(afiliadoId, brand.id);
     }
     if (!rule) {
-      rule = await findRuleForInfluencerAndBrand(influencerId, null);
+      rule = await findRuleForAfiliadoAndBrand(afiliadoId, null);
     }
 
     if (!rule) {
@@ -193,14 +189,16 @@ async function syncOrders() {
 
   let imported = 0;
   for (const order of orders) {
-    const influencerId = await determineInfluencerFromOrder(order);
-    if (!influencerId) continue;
+    // Fetch cart rules explicitly as they might not be in the order list response
+    const cartRules = await prestashopService.fetchOrderCartRules(settings, order.id);
+    const afiliadoId = await determineAfiliadoFromOrder(order, cartRules, settings);
+    if (!afiliadoId) continue;
 
     const customerEmail = order.email || order.customer_email || order?.customer?.email || null;
     const customer = await createOrUpdateCustomer(
       order.id_customer,
       customerEmail,
-      influencerId,
+      afiliadoId,
     );
     const previousCount = await countCustomerCommissions(customer.id);
     const isFirst = previousCount === 0;
@@ -209,7 +207,7 @@ async function syncOrders() {
     const { commissionTotal, orderTotalWithVat } = await calculateCommissionForOrder({
       order,
       orderDetails,
-      influencerId,
+      afiliadoId,
       isFirst,
     });
 
@@ -218,7 +216,7 @@ async function syncOrders() {
     await insertCommission({
       prestashopOrderId: order.id,
       customerId: customer.id,
-      influencerId,
+      afiliadoId,
       orderTotalWithVat,
       commissionEarned: commissionTotal,
       isFirstPurchase: isFirst,
@@ -229,21 +227,21 @@ async function syncOrders() {
   return imported;
 }
 
-async function listCommissionsByInfluencer(influencerId) {
+async function listCommissionsByAfiliado(afiliadoId) {
   const [rows] = await db.query(
     `SELECT * FROM psrst_commissions 
-     WHERE influencer_id = ?
+     WHERE afiliado_id = ?
      ORDER BY order_created_at DESC`,
-    [influencerId],
+    [afiliadoId],
   );
   return rows;
 }
 
 module.exports = {
   getTotalsForAdmin,
-  getTotalsForInfluencer,
+  getTotalsForAfiliado,
   getPendingPayouts,
   markCommissionsAsPaid,
   syncOrders,
-  listCommissionsByInfluencer,
+  listCommissionsByAfiliado,
 };

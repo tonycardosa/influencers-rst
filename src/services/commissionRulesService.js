@@ -11,7 +11,7 @@ async function listRules() {
   return rows;
 }
 
-async function listRulesByInfluencer(influencerId) {
+async function listRulesByAfiliado(influencerId) {
   const [rows] = await db.query(
     `SELECT cr.*, b.name AS brand_name
      FROM psrst_commission_rules cr
@@ -38,7 +38,7 @@ async function deleteRule(id) {
   await db.query('DELETE FROM psrst_commission_rules WHERE id = ?', [id]);
 }
 
-async function findRuleForInfluencerAndBrand(influencerId, brandId) {
+async function findRuleForAfiliadoAndBrand(influencerId, brandId) {
   const params = [influencerId];
   let sql = 'SELECT * FROM psrst_commission_rules WHERE user_id = ? AND ';
   if (brandId) {
@@ -54,8 +54,8 @@ async function findRuleForInfluencerAndBrand(influencerId, brandId) {
 
 module.exports = {
   listRules,
-  listRulesByInfluencer,
+  listRulesByAfiliado,
   upsertRule,
   deleteRule,
-  findRuleForInfluencerAndBrand,
+  findRuleForAfiliadoAndBrand,
 };

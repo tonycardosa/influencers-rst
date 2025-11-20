@@ -2,10 +2,10 @@ const express = require('express');
 const asyncHandler = require('../utils/asyncHandler');
 const { isAuthenticated } = require('../middleware/auth');
 const {
-  getTotalsForInfluencer,
-  listCommissionsByInfluencer,
+  getTotalsForAfiliado,
+  listCommissionsByAfiliado,
 } = require('../services/commissionService');
-const { listRulesByInfluencer } = require('../services/commissionRulesService');
+const { listRulesByAfiliado } = require('../services/commissionRulesService');
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router.use(isAuthenticated);
 router.get(
   '/reports',
   asyncHandler(async (req, res) => {
-    const totals = await getTotalsForInfluencer(req.session.userId);
+    const totals = await getTotalsForAfiliado(req.session.userId);
     res.render('influencer_reports', { title: 'Relatórios', totals });
   }),
 );
@@ -22,7 +22,7 @@ router.get(
 router.get(
   '/reports/commissions',
   asyncHandler(async (req, res) => {
-    const commissions = await listCommissionsByInfluencer(req.session.userId);
+    const commissions = await listCommissionsByAfiliado(req.session.userId);
     res.render('influencer_commissions', { title: 'Comissões', commissions });
   }),
 );
@@ -30,7 +30,7 @@ router.get(
 router.get(
   '/reports/rules',
   asyncHandler(async (req, res) => {
-    const rules = await listRulesByInfluencer(req.session.userId);
+    const rules = await listRulesByAfiliado(req.session.userId);
     res.render('influencer_rules', { title: 'Regras', rules });
   }),
 );

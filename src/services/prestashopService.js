@@ -24,7 +24,7 @@ async function fetchOrdersSince(settings, lastOrderId) {
   const params = {
     display: 'full',
     sort: '[id_ASC]',
-    'filter[current_state]': '[2|4|5]',
+    'filter[current_state]': '[2|4|5|9|11|15|17|26]',
   };
   if (filterId) {
     params['filter[id]'] = filterId;
@@ -61,8 +61,40 @@ async function fetchBrands(settings) {
   return manufacturers.manufacturer || [];
 }
 
+async function fetchOrderCartRules(settings, orderId) {
+  const client = createClient(settings);
+  try {
+    const { data } = await client.get(`order_cart_rules`, {
+      params: {
+        display: 'full',
+        "filter[id_order]": orderId
+      },
+    });
+    const cartRulesNode = data?.order_cart_rules;
+    if (cartRulesNode) return [].concat(cartRulesNode);
+  } catch (error) {
+    console.error(`Error fetching cart rules for order ${orderId}:`, error.message);
+  }
+  return [];
+}
+
+async function fetchCartRuleDetails(settings, cartRuleId) {
+  const client = createClient(settings);
+  try {
+    const { data } = await client.get(`cart_rules/${cartRuleId}`, {
+      params: { display: 'full' },
+    });
+    return data.cart_rules[0] || null;
+  } catch (error) {
+    console.error(`Error fetching details for cart rule ${cartRuleId}:`, error.message);
+    return null;
+  }
+}
+
 module.exports = {
   fetchOrdersSince,
   fetchOrderDetails,
   fetchBrands,
+  fetchOrderCartRules,
+  fetchCartRuleDetails,
 };

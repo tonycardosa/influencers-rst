@@ -10,7 +10,7 @@ async function findUserById(id) {
   return rows[0] || null;
 }
 
-async function listInfluencers() {
+async function listAfiliados() {
   const [rows] = await db.query(
     'SELECT id, name, email, created_at FROM psrst_users WHERE role = ? ORDER BY created_at DESC',
     ['influencer'],
@@ -18,7 +18,7 @@ async function listInfluencers() {
   return rows;
 }
 
-async function createInfluencer({ name, email }) {
+async function createAfiliado({ name, email }) {
   await db.query(
     'INSERT INTO psrst_users (name, email, role) VALUES (?, ?, "influencer")',
     [name, email],
@@ -53,8 +53,8 @@ async function removeDiscountCode(id) {
 module.exports = {
   findUserByEmail,
   findUserById,
-  listInfluencers,
-  createInfluencer,
+  listAfiliados,
+  createAfiliado,
   getUserWithDiscountCodes,
   addDiscountCode,
   removeDiscountCode,
